@@ -1,6 +1,12 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include <vector>
+#include <algorithm>
+#include "libtcod/libtcod.hpp"
+#include "TunnelAlgorithm.h"
+
+
 class TunnelAlgorithm;
 
 struct Tile {
@@ -20,8 +26,7 @@ public:
 	bool isWall(int x, int y) const;
 	void render() const;
 protected:
-
-	Tile* tiles;
+	std::vector<Tile> tiles;
 	TunnelAlgorithm* generator;
 	void setWall(int x, int y);
 };

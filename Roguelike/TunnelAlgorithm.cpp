@@ -1,7 +1,4 @@
-#include "Map.h"
 #include "TunnelAlgorithm.h"
-#include "libtcod/libtcod.hpp"
-#include <algorithm>
 
 Rect::Rect(int x1, int y1, int w, int h) : x1(x1), y1(y1), x2(x1 + w), y2(x1 + h), centerX((x1+y2)/2), centerY((y1+y2)/2){}
 Rect::Rect() : x1(NULL), y1(NULL), x2(NULL), y2(NULL), centerX(NULL), centerY(NULL){}
@@ -13,18 +10,17 @@ bool Rect::intersects(Rect &r2) {
 
 TunnelAlgorithm::TunnelAlgorithm(int rMax, int rMin, int rMaxRoom, int mWidth, int mHeight): ROOM_MAX_SIZE(rMax), ROOM_MIN_SIZE(rMin), ROOM_MAX_NUM(rMaxRoom), mWidth(mWidth), mHeight(mHeight)
 {
-	mtiles = new Tile[mWidth * mHeight];
+	mtiles.resize(mWidth*mHeight);
 }
 
 
 TunnelAlgorithm::~TunnelAlgorithm()
 {
-	delete[] mtiles;
+
 }
 
-Tile* TunnelAlgorithm::GenerateLevel() {
-	Rect* rooms;
-	rooms = new Rect[ROOM_MAX_NUM];
+std::vector<Tile> TunnelAlgorithm::GenerateLevel() {
+	auto rooms = new Rect[ROOM_MAX_NUM]();
 	int numRooms = 0;
 	for (int i = 0; i < ROOM_MAX_NUM; ++i) {
 		TCODRandom* rng = TCODRandom::getInstance();
@@ -66,7 +62,6 @@ Tile* TunnelAlgorithm::GenerateLevel() {
 			numRooms += 1;
 		}
 	}
-	delete[] rooms;
 	return mtiles;
 }
 

@@ -1,6 +1,11 @@
 #ifndef TUNNELALGORITHM_H
 #define TUNNELALGORITHM_H
 
+#include <vector>
+#include "Map.h"
+#include "libtcod/libtcod.hpp"
+#include <algorithm>
+
 struct Rect {
 	int x1; 
 	int y1;
@@ -20,9 +25,9 @@ public:
 	int mHeight;
 	TunnelAlgorithm(int rMax, int rMin, int rMaxRoom, int mWidth, int mHeight);
 	~TunnelAlgorithm();
-	Tile* GenerateLevel();
+	std::vector<Tile> GenerateLevel();
 private:
-	Tile* mtiles;
+	std::vector<Tile> mtiles;
 	const int ROOM_MAX_SIZE;
 	const int ROOM_MIN_SIZE;
 	const int ROOM_MAX_NUM;

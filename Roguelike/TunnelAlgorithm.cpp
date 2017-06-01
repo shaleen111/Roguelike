@@ -1,24 +1,30 @@
-#include "libtcod/libtcod.hpp"
+#include "Map.h"
 #include "TunnelAlgorithm.h"
+#include "libtcod/libtcod.hpp"
 #include <algorithm>
 
+Rect::Rect(int x1, int y1, int w, int h) : x1(x1), y1(y1), x2(x1 + w), y2(x1 + h), centerX((x1+y2)/2), centerY((y1+y2)/2){
 
-Rect::Rect(int x1, int y1, int w, int h) : x1(x1), y1(y1), x2(x1 + w), y2(y1 + h), centerX((x1+(x1+w))/2), centerY((y1+(y1+h))/2){}
-Rect::Rect() : x1(0), y1(0), x2(0), y2(0), centerX(0), centerY(0){}
+}
 
-bool Rect::intersects(Rect &r2) {
-	return ((x1 <= r2.x2 && x2 >= r2.x1) && (y1 <= r2.y2 && r2.y2 >= r2.y1));
+bool Rect::intersects(Rect *r2) {
+	return ((x1 <= r2->x2 && x2 >= r2->x1) && (y1 <= r2->y2 && r2->y2 >= r2->y1));
 }
 
 
 TunnelAlgorithm::TunnelAlgorithm(int rMax, int rMin, int rMaxRoom, int mWidth, int mHeight): ROOM_MAX_SIZE(rMax), ROOM_MIN_SIZE(rMin), ROOM_MAX_NUM(rMaxRoom), mWidth(mWidth), mHeight(mHeight)
 {
+	mtiles = new Tile[mWidth * mHeight];
 }
 
 
-std::vector<Tile> TunnelAlgorithm::GenerateLevel() {
-	std::vector<Tile> mtiles(mWidth * mHeight);
-	std::vector<Rect> rooms(ROOM_MAX_NUM);
+TunnelAlgorithm::~TunnelAlgorithm()
+{
+}
+
+Tile* TunnelAlgorithm::GenerateLevel() {
+	Rect** rooms;
+	rooms = new Rect*[ROOM_MAX_NUM];
 	int numRooms = 0;
 	for (int i = 0; i < ROOM_MAX_NUM; ++i) {
 		TCODRandom* rng = TCODRandom::getInstance();
@@ -30,7 +36,7 @@ std::vector<Tile> TunnelAlgorithm::GenerateLevel() {
 		Rect* nRoom = new Rect(x,y,w, h);
 
 		bool rGFail = false;
-		int size = rooms.size();
+
 		for (int j = 0; j < numRooms; ++j){
 			if (nRoom->intersects(rooms[j])) {
 				rGFail = true;
@@ -39,54 +45,53 @@ std::vector<Tile> TunnelAlgorithm::GenerateLevel() {
 		}
 		 
 		if (!rGFail) {
-			createRoom(nRoom, mtiles);
+			createRoom(nRoom);
 			int newX = nRoom->centerX;
 			int newY = nRoom->centerY;
 
 			if (numRooms != 0) {
-				int prevX = rooms[numRooms - 1].centerX;
-				int prevY = rooms[numRooms - 1].centerY;
+				int prevX = rooms[numRooms - 1]->centerX;
+				int prevY = rooms[numRooms - 1]->centerY;
 
 				if (rng->getInt(0, 1) == 1) {
-					createHTunnel(prevX, newX, prevY, mtiles);
-					createVTunnel(prevY, newY, newX, mtiles);
+					createHTunnel(prevX, newX, prevY);
+					createVTunnel(prevY, newY, newX);
 				}
 				else {
-					createVTunnel(prevY, newY, prevX, mtiles);
-					createHTunnel(prevX, newX, newY, mtiles);
+					createVTunnel(prevY, newY, prevX);
+					createHTunnel(prevX, newX, newY);
 				}
 			}
-			rooms.push_back(*nRoom);
+			rooms[numRooms] = nRoom;
 			numRooms += 1;
 		}
 	}
+	delete[] rooms;
 	return mtiles;
 }
 
-void TunnelAlgorithm::createRoom(Rect* room, std::vector<Tile> &tile){
+void TunnelAlgorithm::createRoom(Rect* room){
 	int x = room->x1 +1 ;
 	int y = room->y1 +1;
-	int x2 = room->x2;
-	int y2 = room->y2;
-	for (x; x < x2; ++x) {
-		for (y; y < y2; ++y) {
-			tile[x + (y*mWidth)].canWalk = true;
+	for (x; x < room->x2; ++x) {
+		for (y; y < room->y2; ++y) {
+			mtiles[x + (y*mWidth)].canWalk = true;
 		}
 	}
 }
 
 
-void TunnelAlgorithm::createHTunnel(int x1, int x2, int y, std::vector<Tile> &tile){
+void TunnelAlgorithm::createHTunnel(int x1, int x2, int y){
 	int m = std::max(x1, x2);
 	for (int x= std::min(x1, x2); x <= m; ++x) {
-		tile[x + y*mWidth].canWalk = true;
+		mtiles[x + y*mWidth].canWalk = true;
 	}
 }
 
 
-void TunnelAlgorithm::createVTunnel(int y1, int y2, int x, std::vector<Tile> &tile){
+void TunnelAlgorithm::createVTunnel(int y1, int y2, int x){
 	int m = std::max(y1, y2);
 	for (int y = std::min(y1, y2); y <= m; ++y) {
-		tile[x + y*mWidth].canWalk = true;
+		mtiles[x + y*mWidth].canWalk = true;
 	}
 }

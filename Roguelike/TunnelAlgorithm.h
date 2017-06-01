@@ -10,7 +10,8 @@ struct Rect {
 	int centerY;
 
 	Rect(int x1, int y1, int w, int h);
-	bool intersects(Rect *r2);
+	Rect();
+	bool intersects(Rect &r2);
 };
 class TunnelAlgorithm
 {
@@ -25,7 +26,7 @@ private:
 	const int ROOM_MAX_SIZE;
 	const int ROOM_MIN_SIZE;
 	const int ROOM_MAX_NUM;
-	void createRoom(Rect* room);
+	void createRoom(Rect& room);
 	void createHTunnel(int x1, int x2, int y);
 	void createVTunnel(int y1, int y2, int x);
 };

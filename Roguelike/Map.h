@@ -25,6 +25,7 @@ public:
 protected:
 	std::vector<Tile> tiles;
 	TunnelAlgorithm* generator;
+	void setWall(int x, int y);
 };
 #endif
 

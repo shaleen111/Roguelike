@@ -24,3 +24,6 @@ void Map::render() const {
 	}
 }
 
+void Map::setWall(int x, int y) {
+	tiles[x + y*width].canWalk = false;
+}

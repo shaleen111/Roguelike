@@ -9,13 +9,9 @@ class TunnelAlgorithm;
 struct Camera {
 	int cX;
 	int cY;
-	int w;
-	int h;
 
-	Camera():cX(0), cY(0), w(80), h(50){}
-	void moveCam(int ax, int ay);
-	int convertX(int ax);
-	int convertY(int ay);
+
+	Camera():cX(0), cY(0){}
 };
 struct Tile {
 	bool explored;

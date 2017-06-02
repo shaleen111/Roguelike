@@ -1,9 +1,6 @@
 #ifndef ENGINE_H
 #define ENGINE_H
-#include "Map.h"
 #include "Actor.h"
-
-
 
 class Engine
 {

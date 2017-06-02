@@ -74,8 +74,8 @@ void TunnelAlgorithm::GenerateLevel(TCODMap* tmap) {
 			numRooms += 1;
 		}
 	}
-	engine.player->x = engine.map->camera->convertX(rooms[0].centerX);
-	engine.player->y = engine.map->camera->convertY(rooms[0].centerY);
+	engine.player->x = rooms[0].centerX;
+	engine.player->y = rooms[0].centerY;
 	tmap->copy(mtiles);
 }
 
@@ -86,7 +86,7 @@ void TunnelAlgorithm::createRoom(Rect& room){
 		}
 	}
 	 if (rng->getInt(0, 3) == 0) {
-		engine.actors.push(new Actor(engine.map->camera->convertX(room.centerX), engine.map->camera->convertY(room.centerY), '@',TCODColor::yellow));
+		engine.actors.push(new Actor(room.centerX, room.centerY, '@',TCODColor::yellow));
 	}
 }
 

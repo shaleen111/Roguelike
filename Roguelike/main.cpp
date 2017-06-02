@@ -1,5 +1,4 @@
 #include "libtcod/libtcod.hpp"
-#include "Actor.h"
 #include "Map.h"
 #include "Engine.h"
 

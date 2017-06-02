@@ -1,14 +1,14 @@
 #include "Map.h"
 #include "TunnelAlgorithm.h"
-#include "libtcod/libtcod.hpp"
 #include <algorithm>
+#include "Engine.h"
 
 Rect::Rect(int x1, int y1, int w, int h) : x1(x1), y1(y1), x2(x1 + w), y2(y1 + h), centerX((x1+(x1 + w))/2), centerY((y1+(y1 + h))/2){
 
 }
 
 
-Rect::Rect() : x1(40), y1(25), x2(80), y2(65), centerX(60), centerY(45) {
+Rect::Rect() : x1(NULL), y1(NULL), x2(NULL), y2(NULL), centerX(NULL), centerY(NULL) {
 
 }
 
@@ -20,21 +20,21 @@ bool Rect::intersects(Rect &r2) {
 
 TunnelAlgorithm::TunnelAlgorithm(int rMax, int rMin, int rMaxRoom, int mWidth, int mHeight): ROOM_MAX_SIZE(rMax), ROOM_MIN_SIZE(rMin), ROOM_MAX_NUM(rMaxRoom), mWidth(mWidth), mHeight(mHeight)
 {
-	mtiles = new Tile[mWidth * mHeight];
+	rng = TCODRandom::getInstance();
+	rooms = new Rect[ROOM_MAX_NUM];
+	mtiles = new TCODMap(mWidth ,  mHeight);
 }
 
 
 TunnelAlgorithm::~TunnelAlgorithm()
 {
+	delete[] rooms;
+	delete rng;
 	delete[] mtiles;
 }
-
-Tile* TunnelAlgorithm::GenerateLevel() {
-	Rect* rooms;
-	rooms = new Rect[ROOM_MAX_NUM];
+void TunnelAlgorithm::GenerateLevel(TCODMap* tmap) {
 	int numRooms = 0;
 	for (int i = 0; i < ROOM_MAX_NUM; i++) {
-		TCODRandom* rng = TCODRandom::getInstance();
 		int w = rng->getInt(ROOM_MIN_SIZE, ROOM_MAX_SIZE);
 		int h = rng->getInt(ROOM_MIN_SIZE, ROOM_MAX_SIZE);
 		int x = rng->getInt(0, (mWidth -1)  - w );
@@ -74,15 +74,19 @@ Tile* TunnelAlgorithm::GenerateLevel() {
 			numRooms += 1;
 		}
 	}
-	delete[] rooms;
-	return mtiles;
+	engine.player->x = engine.map->camera->convertX(rooms[0].centerX);
+	engine.player->y = engine.map->camera->convertY(rooms[0].centerY);
+	tmap->copy(mtiles);
 }
 
 void TunnelAlgorithm::createRoom(Rect& room){
 	for (int x = room.x1; x <= room.x2; x++) {
 		for (int y = room.y1; y <= room.y2; y++) {
-			mtiles[x + (y*mWidth)].canWalk = true;
+			mtiles->setProperties(x, y, false, true);
 		}
+	}
+	 if (rng->getInt(0, 3) == 0) {
+		engine.actors.push(new Actor(engine.map->camera->convertX(room.centerX), engine.map->camera->convertY(room.centerY), '@',TCODColor::yellow));
 	}
 }
 
@@ -90,7 +94,8 @@ void TunnelAlgorithm::createRoom(Rect& room){
 void TunnelAlgorithm::createHTunnel(int x1, int x2, int y){
 	int m = std::max(x1, x2);
 	for (int x= std::min(x1, x2); x <= m; x++) {
-		mtiles[x + y*mWidth].canWalk = true;
+		mtiles->setProperties(x, y, false, true);
+
 	}
 }
 
@@ -98,6 +103,6 @@ void TunnelAlgorithm::createHTunnel(int x1, int x2, int y){
 void TunnelAlgorithm::createVTunnel(int y1, int y2, int x){
 	int m = std::max(y1, y2);
 	for (int y = std::min(y1, y2); y <= m; y++) {
-		mtiles[x + y*mWidth].canWalk = true;
+		mtiles->setProperties(x,y, false, true); 
 	}
 }

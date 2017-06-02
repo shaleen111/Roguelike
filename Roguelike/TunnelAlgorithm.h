@@ -1,6 +1,8 @@
 #ifndef TUNNELALGORITHM_H
 #define TUNNELALGORITHM_H
 
+#include "libtcod/libtcod.hpp"
+
 struct Rect {
 	int x1; 
 	int y1;
@@ -20,9 +22,11 @@ public:
 	int mHeight;
 	TunnelAlgorithm(int rMax, int rMin, int rMaxRoom, int mWidth, int mHeight);
 	~TunnelAlgorithm();
-	Tile* GenerateLevel();
+	void GenerateLevel(TCODMap* tmap);
 private:
-	Tile* mtiles;
+	TCODRandom* rng;
+	Rect* rooms;
+	TCODMap* mtiles;
 	const int ROOM_MAX_SIZE;
 	const int ROOM_MIN_SIZE;
 	const int ROOM_MAX_NUM;

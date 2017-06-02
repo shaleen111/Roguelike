@@ -1,7 +1,7 @@
-#include "Map.h"
 #include "TunnelAlgorithm.h"
 #include <algorithm>
 #include "Engine.h"
+#include "Map.h"
 
 Rect::Rect(int x1, int y1, int w, int h) : x1(x1), y1(y1), x2(x1 + w), y2(y1 + h), centerX((x1+(x1 + w))/2), centerY((y1+(y1 + h))/2){
 

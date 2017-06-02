@@ -1,14 +1,13 @@
 #include "libtcod/libtcod.hpp"
-#include "Map.h"
 #include "Engine.h"
-
+#include "Map.h"
 
 Engine::Engine(): fovRadius(10), computeFOV(true) {
 	TCODConsole::setCustomFont("tileset.png", TCOD_FONT_LAYOUT_ASCII_INROW);
-	TCODConsole::initRoot(80, 50, "Syrsa", true);
+	TCODConsole::initRoot(80, 50, "Syrsa", false);
 	player = new Actor(40, 25, '@', TCODColor::white);
 	actors.push(player);
-	map = new Map(100, 70);
+	map = new Map(100, 100);
 }
 
 
@@ -59,8 +58,8 @@ void Engine::render() {
 
 	for (Actor **i = actors.begin(); i != actors.end(); i++ ) {
 		Actor* actor = *i;
-		if (map->isInFOV(actor->x, actor->y)) {
-			(*i)->render();
+		if (map->isInFOV(map->camera->getCX(actor->x), map->camera->getCY(actor->y))) {
+			(*i)->render(map->camera->getCX(actor->x),map->camera->getCY(actor->y));
 		}
 	}
 }
